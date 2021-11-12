@@ -113,53 +113,65 @@ export default class PaymentModal extends Vue {
 	}
 
 	async approve() {
-		const erc = erc20(this.selectedToken.address)
-		const data = erc.interface.encodeFunctionData('approve', [
-			paymentAddress,
-			uint256Max,
-		])
-		const signer = provider.getSigner()
-		const from = await signer.getAddress()
-		const tx = await signer.sendTransaction({
-			from,
-			to: this.selectedToken.address,
-			data,
-		})
-		await tx.wait()
-		await this.updateBtn()
+		try {
+			const erc = erc20(this.selectedToken.address)
+			const data = erc.interface.encodeFunctionData('approve', [
+				paymentAddress,
+				uint256Max,
+			])
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
+			const tx = await signer.sendTransaction({
+				from,
+				to: this.selectedToken.address,
+				data,
+			})
+			await tx.wait()
+			await this.updateBtn()
+		} catch (e) {
+			this.popError(e)
+		}
 	}
 
 	async buy() {
-		const data = payment.interface.encodeFunctionData('buy', [
-			this.selectedToken.index,
-			this.combo.level,
-			this.selectedExpiration.value,
-		])
-		const signer = provider.getSigner()
-		const from = await signer.getAddress()
-		const tx = await signer.sendTransaction({
-			from,
-			to: paymentAddress,
-			data,
-		})
-		await tx.wait()
+		try {
+			const data = payment.interface.encodeFunctionData('buy', [
+				this.selectedToken.index,
+				this.combo.level,
+				this.selectedExpiration.value,
+			])
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
+			const tx = await signer.sendTransaction({
+				from,
+				to: paymentAddress,
+				data,
+			})
+			await tx.wait()
+		} catch (e) {
+			this.popError(e)
+		}
 	}
 
 	async upgrade() {
-		const data = payment.interface.encodeFunctionData('upgrade', [
-			this.selectedToken.index,
-			this.combo.level,
-			this.selectedExpiration.value,
-		])
-		const signer = provider.getSigner()
-		const from = await signer.getAddress()
-		const tx = await signer.sendTransaction({
-			from,
-			to: paymentAddress,
-			data,
-		})
-		await tx.wait()
-		this.updateBtn()
+		try {
+			const data = payment.interface.encodeFunctionData('upgrade', [
+				this.selectedToken.index,
+				this.combo.level,
+				this.selectedExpiration.value,
+			])
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
+			const tx = await signer.sendTransaction({
+				from,
+				to: paymentAddress,
+				data,
+			})
+			await tx.wait()
+			this.updateBtn()
+		} catch (e) {
+			this.popError(e)
+		}
 	}
 
 	async updateBtn() {

@@ -27,7 +27,7 @@ declare module 'vue/types/vue' {
 			args?: any[],
 			options?: CallOption
 		): Promise<any>
-
+		popError(e: any)
 		getBalance(options?: CallOption): Promise<any>
 		getAccount(): Promise<string>
 	}

@@ -94,35 +94,43 @@ export default class RenewModal extends Vue {
 	}
 
 	async approve() {
-		const erc = erc20(this.selectedToken.address)
-		const data = erc.interface.encodeFunctionData('approve', [
-			paymentAddress,
-			uint256Max,
-		])
-		const signer = provider.getSigner()
-		const from = await signer.getAddress()
-		const tx = await signer.sendTransaction({
-			from,
-			to: this.selectedToken.address,
-			data,
-		})
-		await tx.wait()
+		try {
+			const erc = erc20(this.selectedToken.address)
+			const data = erc.interface.encodeFunctionData('approve', [
+				paymentAddress,
+				uint256Max,
+			])
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
+			const tx = await signer.sendTransaction({
+				from,
+				to: this.selectedToken.address,
+				data,
+			})
+			await tx.wait()
+		} catch (e) {
+			this.popError(e)
+		}
 	}
 
 	async renew() {
-		const data = payment.interface.encodeFunctionData('renew', [
-			this.selectedToken.index,
-			this.selectedExpiration.value,
-		])
-		const signer = provider.getSigner()
-		const from = await signer.getAddress()
-		const tx = await signer.sendTransaction({
-			from,
-			to: paymentAddress,
-			data,
-		})
+		try {
+			const data = payment.interface.encodeFunctionData('renew', [
+				this.selectedToken.index,
+				this.selectedExpiration.value,
+			])
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
+			const tx = await signer.sendTransaction({
+				from,
+				to: paymentAddress,
+				data,
+			})
 
-		await tx.wait()
+			await tx.wait()
+		} catch (e) {
+			this.popError(e)
+		}
 	}
 
 	async checkApprove() {

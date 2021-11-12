@@ -37,11 +37,11 @@ export default class ETHMixin extends Vue {
 
 	public popError(e: any) {
 		if (typeof e === 'string') {
-			return this.$message.error(e)
+			return this.$message.error(e, 3)
 		} else if (e.message) {
-			return this.$message.error(e.message)
+			return this.$message.error(e.message, 3)
 		} else {
-			return this.$message.error(JSON.stringify(e))
+			return this.$message.error(JSON.stringify(e), 3)
 		}
 	}
 
