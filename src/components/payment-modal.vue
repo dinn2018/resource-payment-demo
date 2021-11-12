@@ -51,10 +51,11 @@
 <script lang="ts">
 import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
 import { payment, erc20, paymentAddress, provider } from '@/factories'
-import Tokens from '@/components/tokens.vue'
-import Expirations from '@/components/expirations.vue'
 import { BigNumber } from 'ethers'
 import { formatToken, uint256Max } from '@/utils'
+import Tokens from '@/components/tokens.vue'
+import Expirations from '@/components/expirations.vue'
+
 @Component({
 	components: {
 		Tokens,

@@ -148,7 +148,7 @@ export default class App extends Vue {
 
 	initExpirations() {
 		const onemonth = 30 * 24 * 3600
-		const expirations:Entity.Expiration[] = []
+		const expirations: Entity.Expiration[] = []
 		for (let i = 1; i <= 3; i++) {
 			expirations.push({ value: onemonth * i, title: `${i} months` })
 		}
@@ -159,6 +159,7 @@ export default class App extends Vue {
 	listen() {
 		window.ethereum.on('accountsChanged', (accounts) => {
 			this.$store.commit(UPDATE_ACCOUNT, accounts[0])
+			window.location.reload()
 		})
 
 		window.ethereum.on('chainChanged', (chainId) => {
