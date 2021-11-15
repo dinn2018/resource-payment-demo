@@ -5,7 +5,7 @@
 				<a-col
 					v-for="(combo, i) of combos"
 					:key="`${i}-${combo.level}`"
-					:span="8"
+					:span="12"
 					:value="`${i}`"
 				>
 					<a-card
