@@ -25,7 +25,6 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		"MinExpiration()": FunctionFragment;
 		"addCombo((uint256,uint256,uint256,uint256,bool,string))": FunctionFragment;
 		"addToken(address)": FunctionFragment;
-		"beneficiary()": FunctionFragment;
 		"buy(address,uint256,uint256,uint256)": FunctionFragment;
 		"canBuy(address,uint256)": FunctionFragment;
 		"canRenew(address)": FunctionFragment;
@@ -34,6 +33,7 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		"comboLength()": FunctionFragment;
 		"combos(uint256)": FunctionFragment;
 		"expiration(address)": FunctionFragment;
+		"expirationAt(address)": FunctionFragment;
 		"getComboCost(uint256,uint256)": FunctionFragment;
 		"getUpgradeExchange(address,uint256)": FunctionFragment;
 		"isExpired(address)": FunctionFragment;
@@ -82,10 +82,6 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	): string;
 	encodeFunctionData(functionFragment: "addToken", values: [string]): string;
 	encodeFunctionData(
-		functionFragment: "beneficiary",
-		values?: undefined
-	): string;
-	encodeFunctionData(
 		functionFragment: "buy",
 		values: [string, BigNumberish, BigNumberish, BigNumberish]
 	): string;
@@ -108,6 +104,10 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		values: [BigNumberish]
 	): string;
 	encodeFunctionData(functionFragment: "expiration", values: [string]): string;
+	encodeFunctionData(
+		functionFragment: "expirationAt",
+		values: [string]
+	): string;
 	encodeFunctionData(
 		functionFragment: "getComboCost",
 		values: [BigNumberish, BigNumberish]
@@ -203,10 +203,6 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	): Result;
 	decodeFunctionResult(functionFragment: "addCombo", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "addToken", data: BytesLike): Result;
-	decodeFunctionResult(
-		functionFragment: "beneficiary",
-		data: BytesLike
-	): Result;
 	decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "canBuy", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "canRenew", data: BytesLike): Result;
@@ -218,6 +214,10 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	): Result;
 	decodeFunctionResult(functionFragment: "combos", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "expiration", data: BytesLike): Result;
+	decodeFunctionResult(
+		functionFragment: "expirationAt",
+		data: BytesLike
+	): Result;
 	decodeFunctionResult(
 		functionFragment: "getComboCost",
 		data: BytesLike
@@ -561,8 +561,6 @@ export class ResourcePayment extends BaseContract {
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
 
-		beneficiary(overrides?: CallOverrides): Promise<[string]>;
-
 		buy(
 			to: string,
 			tokenIndex: BigNumberish,
@@ -604,6 +602,8 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		expiration(to: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+		expirationAt(to: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
 		getComboCost(
 			level: BigNumberish,
@@ -772,8 +772,6 @@ export class ResourcePayment extends BaseContract {
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
 
-	beneficiary(overrides?: CallOverrides): Promise<string>;
-
 	buy(
 		to: string,
 		tokenIndex: BigNumberish,
@@ -815,6 +813,8 @@ export class ResourcePayment extends BaseContract {
 	>;
 
 	expiration(to: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+	expirationAt(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 	getComboCost(
 		level: BigNumberish,
@@ -977,15 +977,13 @@ export class ResourcePayment extends BaseContract {
 
 		addToken(token: string, overrides?: CallOverrides): Promise<void>;
 
-		beneficiary(overrides?: CallOverrides): Promise<string>;
-
 		buy(
 			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: CallOverrides
-		): Promise<void>;
+		): Promise<BigNumber>;
 
 		canBuy(
 			to: string,
@@ -1020,6 +1018,8 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		expiration(to: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+		expirationAt(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 		getComboCost(
 			level: BigNumberish,
@@ -1092,7 +1092,7 @@ export class ResourcePayment extends BaseContract {
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: CallOverrides
-		): Promise<void>;
+		): Promise<BigNumber>;
 
 		renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -1143,7 +1143,7 @@ export class ResourcePayment extends BaseContract {
 			level: BigNumberish,
 			moreExpiration: BigNumberish,
 			overrides?: CallOverrides
-		): Promise<void>;
+		): Promise<BigNumber>;
 
 		validateCombo(
 			level: BigNumberish,
@@ -1702,8 +1702,6 @@ export class ResourcePayment extends BaseContract {
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<BigNumber>;
 
-		beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
-
 		buy(
 			to: string,
 			tokenIndex: BigNumberish,
@@ -1733,6 +1731,8 @@ export class ResourcePayment extends BaseContract {
 		combos(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
 		expiration(to: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+		expirationAt(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 		getComboCost(
 			level: BigNumberish,
@@ -1871,8 +1871,6 @@ export class ResourcePayment extends BaseContract {
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<PopulatedTransaction>;
 
-		beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
 		buy(
 			to: string,
 			tokenIndex: BigNumberish,
@@ -1908,6 +1906,11 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		expiration(
+			to: string,
+			overrides?: CallOverrides
+		): Promise<PopulatedTransaction>;
+
+		expirationAt(
 			to: string,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;

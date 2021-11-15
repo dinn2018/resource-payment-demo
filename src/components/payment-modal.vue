@@ -106,7 +106,7 @@ export default class PaymentModal extends Vue {
 		const combo = await payment.combos(this.combo?.level ?? 0)
 		if (combo.isValid) {
 			this.cost = await payment.getComboCost(
-				this.combo.level,
+				this.combo?.level ?? 0,
 				this.selectedExpiration.value
 			)
 		}
@@ -190,7 +190,10 @@ export default class PaymentModal extends Vue {
 		if (this.canUpgrade) {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
-			const upgraded = await payment.getUpgradeExchange(from, this.combo.level)
+			const upgraded = await payment.getUpgradeExchange(
+				from,
+				this.combo?.level ?? 0
+			)
 			this.upgradingExp = upgraded.toNumber()
 			const max = await payment.maxTotalUpgradeExpiration(
 				from,

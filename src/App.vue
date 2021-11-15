@@ -78,8 +78,8 @@ export default class App extends Vue {
 	async checkState() {
 		if (window.ethereum) {
 			this.initExpirations()
-			this.initCombos()
-			this.initTokens()
+			await this.initTokens()
+			await this.initCombos()
 			const signer = provider.getSigner()
 			const account = await signer.getAddress()
 			const chainId = await signer.getChainId()
@@ -147,8 +147,12 @@ export default class App extends Vue {
 	}
 
 	initExpirations() {
-		const onemonth = 30 * 24 * 3600
 		const expirations: Entity.Expiration[] = []
+		const onemin = 60
+		for (let i = 1; i <= 5; i++) {
+			expirations.push({ value: onemin * i, title: `${i} mins` })
+		}
+		const onemonth = 30 * 24 * 3600
 		for (let i = 1; i <= 3; i++) {
 			expirations.push({ value: onemonth * i, title: `${i} months` })
 		}

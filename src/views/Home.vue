@@ -40,7 +40,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { BigNumber } from 'ethers'
 import { payment, provider } from '@/factories'
-
+import moment from 'moment'
 import Combos from '@/components/combos.vue'
 import PaymentModal from '@/components/payment-modal.vue'
 import RenewModal from '@/components/renew-modal.vue'
@@ -93,7 +93,11 @@ export default class Home extends Vue {
 	}
 
 	get exp() {
-		return 'expired on:' + new Date(this.expiration * 1000).toString()
+		const days = Math.floor(this.expiration / (3600 * 24))
+		const hours = Math.floor((this.expiration % (3600 * 24)) / 3600)
+		const mins = Math.floor((this.expiration % 3600) / 60)
+		const secs = Math.floor(this.expiration % 60)
+		return `expired in: ${days}:${hours}:${mins}:${secs}`
 	}
 
 	async pay() {
