@@ -85,7 +85,7 @@ export default class RenewModal extends Vue {
 	async created() {
 		const signer = provider.getSigner()
 		const from = await signer.getAddress()
-		const max = await payment.maxTotalRenewExpiration({ from })
+		const max = await payment.maxTotalRenewExpiration(from)
 		this.maxRenewExp = max.toNumber()
 	}
 
@@ -115,18 +115,18 @@ export default class RenewModal extends Vue {
 
 	async renew() {
 		try {
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('renew', [
+				from,
 				this.selectedToken.index,
 				this.selectedExpiration.value,
 			])
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
 			const tx = await signer.sendTransaction({
 				from,
 				to: paymentAddress,
 				data,
 			})
-
 			await tx.wait()
 		} catch (e) {
 			this.popError(e)

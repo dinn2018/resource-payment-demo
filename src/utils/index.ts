@@ -26,24 +26,24 @@ export const defaultDeadline = () => {
 }
 
 
-export const formatNetwork = (chainId: string) => {
+export const formatNetwork = (chainId: number) => {
 	switch (chainId) {
-		case '0x1':
+		case 0x1:
 			return 'Mainnet'
-		case '0x3':
+		case 0x3:
 			return 'Ropsten'
-		case '0x4':
+		case 0x4:
 			return 'Rinkeby'
-		case '0x5':
+		case 0x5:
 			return 'Goerli'
-		case '0x2a':
+		case 0x2a:
 			return 'Kovan'
 		default:
 			return 'Unknown'
 	}
 }
 
-export const isNetworkSupported = (chainId: string) => {
+export const isNetworkSupported = (chainId: number) => {
 	return true //chainId == '0x5'
 }
 

@@ -135,13 +135,15 @@ export default class PaymentModal extends Vue {
 
 	async buy() {
 		try {
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('buy', [
+				from,
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
 			])
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
+
 			const tx = await signer.sendTransaction({
 				from,
 				to: paymentAddress,
@@ -155,13 +157,14 @@ export default class PaymentModal extends Vue {
 
 	async upgrade() {
 		try {
+			const signer = provider.getSigner()
+			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('upgrade', [
+				from,
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
 			])
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
 			const tx = await signer.sendTransaction({
 				from,
 				to: paymentAddress,
@@ -177,8 +180,8 @@ export default class PaymentModal extends Vue {
 	async updateBtn() {
 		const signer = provider.getSigner()
 		const from = await signer.getAddress()
-		this.canBuy = await payment.canBuy(this.combo?.level ?? 0, { from })
-		this.canUpgrade = await payment.canUpgrade(this.combo?.level ?? 0, { from })
+		this.canBuy = await payment.canBuy(from, this.combo?.level ?? 0)
+		this.canUpgrade = await payment.canUpgrade(from, this.combo?.level ?? 0)
 		this.checkApprove()
 		this.exchangedUpgradeExp()
 	}
@@ -189,9 +192,10 @@ export default class PaymentModal extends Vue {
 			const from = await signer.getAddress()
 			const upgraded = await payment.getUpgradeExchange(from, this.combo.level)
 			this.upgradingExp = upgraded.toNumber()
-			const max = await payment.maxTotalUpgradeExpiration(this.combo.level, {
+			const max = await payment.maxTotalUpgradeExpiration(
 				from,
-			})
+				this.combo.level
+			)
 			this.maxUpgradingExp = max.toNumber()
 		}
 	}

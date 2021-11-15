@@ -24,7 +24,7 @@ export default class ETHMixin extends Vue {
 			throw 'Please install MetaMask to use this app.'
 		}
 
-		if (!isNetworkSupported(window.ethereum.chainId)) {
+		if (!isNetworkSupported(parseInt(window.ethereum.chainId))) {
 			throw 'Network not supported.'
 		}
 

@@ -89,7 +89,7 @@ export default class Home extends Vue {
 	async updateCanRenew() {
 		const signer = provider.getSigner()
 		const from = await signer.getAddress()
-		this.canRenew = await payment.canRenew({ from })
+		this.canRenew = await payment.canRenew(from)
 	}
 
 	get exp() {

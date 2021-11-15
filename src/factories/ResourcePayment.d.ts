@@ -26,10 +26,10 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		"addCombo((uint256,uint256,uint256,uint256,bool,string))": FunctionFragment;
 		"addToken(address)": FunctionFragment;
 		"beneficiary()": FunctionFragment;
-		"buy(uint256,uint256,uint256)": FunctionFragment;
-		"canBuy(uint256)": FunctionFragment;
-		"canRenew()": FunctionFragment;
-		"canUpgrade(uint256)": FunctionFragment;
+		"buy(address,uint256,uint256,uint256)": FunctionFragment;
+		"canBuy(address,uint256)": FunctionFragment;
+		"canRenew(address)": FunctionFragment;
+		"canUpgrade(address,uint256)": FunctionFragment;
 		"channel()": FunctionFragment;
 		"comboLength()": FunctionFragment;
 		"combos(uint256)": FunctionFragment;
@@ -38,12 +38,12 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		"getUpgradeExchange(address,uint256)": FunctionFragment;
 		"isExpired(address)": FunctionFragment;
 		"lock()": FunctionFragment;
-		"maxTotalRenewExpiration()": FunctionFragment;
-		"maxTotalUpgradeExpiration(uint256)": FunctionFragment;
+		"maxTotalRenewExpiration(address)": FunctionFragment;
+		"maxTotalUpgradeExpiration(address,uint256)": FunctionFragment;
 		"owner()": FunctionFragment;
 		"receipts(address)": FunctionFragment;
 		"removeToken(uint256)": FunctionFragment;
-		"renew(uint256,uint256)": FunctionFragment;
+		"renew(address,uint256,uint256)": FunctionFragment;
 		"renounceOwnership()": FunctionFragment;
 		"setMaxTotalExpriation(uint256)": FunctionFragment;
 		"setMinExpriation(uint256)": FunctionFragment;
@@ -54,7 +54,8 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		"transferRootChannel(address)": FunctionFragment;
 		"unlock()": FunctionFragment;
 		"updateCombo(uint256,(uint256,uint256,uint256,uint256,bool,string))": FunctionFragment;
-		"upgrade(uint256,uint256,uint256)": FunctionFragment;
+		"upgrade(address,uint256,uint256,uint256)": FunctionFragment;
+		"validateCombo(uint256)": FunctionFragment;
 		"withdraw(address,address,uint256)": FunctionFragment;
 	};
 
@@ -86,16 +87,16 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	): string;
 	encodeFunctionData(
 		functionFragment: "buy",
-		values: [BigNumberish, BigNumberish, BigNumberish]
+		values: [string, BigNumberish, BigNumberish, BigNumberish]
 	): string;
 	encodeFunctionData(
 		functionFragment: "canBuy",
-		values: [BigNumberish]
+		values: [string, BigNumberish]
 	): string;
-	encodeFunctionData(functionFragment: "canRenew", values?: undefined): string;
+	encodeFunctionData(functionFragment: "canRenew", values: [string]): string;
 	encodeFunctionData(
 		functionFragment: "canUpgrade",
-		values: [BigNumberish]
+		values: [string, BigNumberish]
 	): string;
 	encodeFunctionData(functionFragment: "channel", values?: undefined): string;
 	encodeFunctionData(
@@ -119,11 +120,11 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	encodeFunctionData(functionFragment: "lock", values?: undefined): string;
 	encodeFunctionData(
 		functionFragment: "maxTotalRenewExpiration",
-		values?: undefined
+		values: [string]
 	): string;
 	encodeFunctionData(
 		functionFragment: "maxTotalUpgradeExpiration",
-		values: [BigNumberish]
+		values: [string, BigNumberish]
 	): string;
 	encodeFunctionData(functionFragment: "owner", values?: undefined): string;
 	encodeFunctionData(functionFragment: "receipts", values: [string]): string;
@@ -133,7 +134,7 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	): string;
 	encodeFunctionData(
 		functionFragment: "renew",
-		values: [BigNumberish, BigNumberish]
+		values: [string, BigNumberish, BigNumberish]
 	): string;
 	encodeFunctionData(
 		functionFragment: "renounceOwnership",
@@ -181,7 +182,11 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 	): string;
 	encodeFunctionData(
 		functionFragment: "upgrade",
-		values: [BigNumberish, BigNumberish, BigNumberish]
+		values: [string, BigNumberish, BigNumberish, BigNumberish]
+	): string;
+	encodeFunctionData(
+		functionFragment: "validateCombo",
+		values: [BigNumberish]
 	): string;
 	encodeFunctionData(
 		functionFragment: "withdraw",
@@ -270,6 +275,10 @@ interface ResourcePaymentInterface extends ethers.utils.Interface {
 		data: BytesLike
 	): Result;
 	decodeFunctionResult(functionFragment: "upgrade", data: BytesLike): Result;
+	decodeFunctionResult(
+		functionFragment: "validateCombo",
+		data: BytesLike
+	): Result;
 	decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
 	events: {
@@ -293,6 +302,7 @@ export type BuyEvent = TypedEvent<
 			BigNumber,
 			BigNumber,
 			BigNumber,
+			BigNumber,
 			[BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -303,9 +313,10 @@ export type BuyEvent = TypedEvent<
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -316,8 +327,9 @@ export type BuyEvent = TypedEvent<
 			};
 		}
 	] & {
-		buyer: string;
+		to: string;
 		receipt: [
+			BigNumber,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -332,9 +344,10 @@ export type BuyEvent = TypedEvent<
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -359,6 +372,7 @@ export type RenewEvent = TypedEvent<
 			BigNumber,
 			BigNumber,
 			BigNumber,
+			BigNumber,
 			[BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -369,9 +383,10 @@ export type RenewEvent = TypedEvent<
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -382,8 +397,9 @@ export type RenewEvent = TypedEvent<
 			};
 		}
 	] & {
-		buyer: string;
+		to: string;
 		receipt: [
+			BigNumber,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -398,9 +414,10 @@ export type RenewEvent = TypedEvent<
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -421,6 +438,7 @@ export type UpgradeEvent = TypedEvent<
 			BigNumber,
 			BigNumber,
 			BigNumber,
+			BigNumber,
 			[BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -431,9 +449,10 @@ export type UpgradeEvent = TypedEvent<
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -444,8 +463,9 @@ export type UpgradeEvent = TypedEvent<
 			};
 		}
 	] & {
-		buyer: string;
+		to: string;
 		receipt: [
+			BigNumber,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -460,9 +480,10 @@ export type UpgradeEvent = TypedEvent<
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -543,17 +564,23 @@ export class ResourcePayment extends BaseContract {
 		beneficiary(overrides?: CallOverrides): Promise<[string]>;
 
 		buy(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
 
-		canBuy(level: BigNumberish, overrides?: CallOverrides): Promise<[boolean]>;
+		canBuy(
+			to: string,
+			level: BigNumberish,
+			overrides?: CallOverrides
+		): Promise<[boolean]>;
 
-		canRenew(overrides?: CallOverrides): Promise<[boolean]>;
+		canRenew(to: string, overrides?: CallOverrides): Promise<[boolean]>;
 
 		canUpgrade(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<[boolean]>;
@@ -576,7 +603,7 @@ export class ResourcePayment extends BaseContract {
 			}
 		>;
 
-		expiration(buyer: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+		expiration(to: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
 		getComboCost(
 			level: BigNumberish,
@@ -585,20 +612,24 @@ export class ResourcePayment extends BaseContract {
 		): Promise<[BigNumber] & { cost: BigNumber }>;
 
 		getUpgradeExchange(
-			buyer: string,
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<[BigNumber] & { expiration_: BigNumber }>;
 
-		isExpired(buyer: string, overrides?: CallOverrides): Promise<[boolean]>;
+		isExpired(to: string, overrides?: CallOverrides): Promise<[boolean]>;
 
 		lock(
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
 
-		maxTotalRenewExpiration(overrides?: CallOverrides): Promise<[BigNumber]>;
+		maxTotalRenewExpiration(
+			to: string,
+			overrides?: CallOverrides
+		): Promise<[BigNumber]>;
 
 		maxTotalUpgradeExpiration(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<[BigNumber]>;
@@ -614,6 +645,7 @@ export class ResourcePayment extends BaseContract {
 				BigNumber,
 				BigNumber,
 				BigNumber,
+				BigNumber,
 				[BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 					bandwidth: BigNumber;
 					storageAmount: BigNumber;
@@ -624,9 +656,10 @@ export class ResourcePayment extends BaseContract {
 				}
 			] & {
 				level: BigNumber;
-				cost: BigNumber;
 				boughtTime: BigNumber;
 				expiration: BigNumber;
+				expectedCost: BigNumber;
+				realCost: BigNumber;
 				combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 					bandwidth: BigNumber;
 					storageAmount: BigNumber;
@@ -644,6 +677,7 @@ export class ResourcePayment extends BaseContract {
 		): Promise<ContractTransaction>;
 
 		renew(
+			to: string,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
@@ -697,11 +731,17 @@ export class ResourcePayment extends BaseContract {
 		): Promise<ContractTransaction>;
 
 		upgrade(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			moreExpiration: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
+
+		validateCombo(
+			level: BigNumberish,
+			overrides?: CallOverrides
+		): Promise<[void]>;
 
 		withdraw(
 			token: string,
@@ -735,17 +775,26 @@ export class ResourcePayment extends BaseContract {
 	beneficiary(overrides?: CallOverrides): Promise<string>;
 
 	buy(
+		to: string,
 		tokenIndex: BigNumberish,
 		level: BigNumberish,
 		expiration_: BigNumberish,
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
 
-	canBuy(level: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+	canBuy(
+		to: string,
+		level: BigNumberish,
+		overrides?: CallOverrides
+	): Promise<boolean>;
 
-	canRenew(overrides?: CallOverrides): Promise<boolean>;
+	canRenew(to: string, overrides?: CallOverrides): Promise<boolean>;
 
-	canUpgrade(level: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+	canUpgrade(
+		to: string,
+		level: BigNumberish,
+		overrides?: CallOverrides
+	): Promise<boolean>;
 
 	channel(overrides?: CallOverrides): Promise<string>;
 
@@ -765,7 +814,7 @@ export class ResourcePayment extends BaseContract {
 		}
 	>;
 
-	expiration(buyer: string, overrides?: CallOverrides): Promise<BigNumber>;
+	expiration(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 	getComboCost(
 		level: BigNumberish,
@@ -774,20 +823,24 @@ export class ResourcePayment extends BaseContract {
 	): Promise<BigNumber>;
 
 	getUpgradeExchange(
-		buyer: string,
+		to: string,
 		level: BigNumberish,
 		overrides?: CallOverrides
 	): Promise<BigNumber>;
 
-	isExpired(buyer: string, overrides?: CallOverrides): Promise<boolean>;
+	isExpired(to: string, overrides?: CallOverrides): Promise<boolean>;
 
 	lock(
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
 
-	maxTotalRenewExpiration(overrides?: CallOverrides): Promise<BigNumber>;
+	maxTotalRenewExpiration(
+		to: string,
+		overrides?: CallOverrides
+	): Promise<BigNumber>;
 
 	maxTotalUpgradeExpiration(
+		to: string,
 		level: BigNumberish,
 		overrides?: CallOverrides
 	): Promise<BigNumber>;
@@ -803,6 +856,7 @@ export class ResourcePayment extends BaseContract {
 			BigNumber,
 			BigNumber,
 			BigNumber,
+			BigNumber,
 			[BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -813,9 +867,10 @@ export class ResourcePayment extends BaseContract {
 			}
 		] & {
 			level: BigNumber;
-			cost: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
+			expectedCost: BigNumber;
+			realCost: BigNumber;
 			combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 				bandwidth: BigNumber;
 				storageAmount: BigNumber;
@@ -833,6 +888,7 @@ export class ResourcePayment extends BaseContract {
 	): Promise<ContractTransaction>;
 
 	renew(
+		to: string,
 		tokenIndex: BigNumberish,
 		expiration_: BigNumberish,
 		overrides?: Overrides & { from?: string | Promise<string> }
@@ -886,11 +942,14 @@ export class ResourcePayment extends BaseContract {
 	): Promise<ContractTransaction>;
 
 	upgrade(
+		to: string,
 		tokenIndex: BigNumberish,
 		level: BigNumberish,
 		moreExpiration: BigNumberish,
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
+
+	validateCombo(level: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
 	withdraw(
 		token: string,
@@ -921,17 +980,23 @@ export class ResourcePayment extends BaseContract {
 		beneficiary(overrides?: CallOverrides): Promise<string>;
 
 		buy(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<void>;
 
-		canBuy(level: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+		canBuy(
+			to: string,
+			level: BigNumberish,
+			overrides?: CallOverrides
+		): Promise<boolean>;
 
-		canRenew(overrides?: CallOverrides): Promise<boolean>;
+		canRenew(to: string, overrides?: CallOverrides): Promise<boolean>;
 
 		canUpgrade(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<boolean>;
@@ -954,7 +1019,7 @@ export class ResourcePayment extends BaseContract {
 			}
 		>;
 
-		expiration(buyer: string, overrides?: CallOverrides): Promise<BigNumber>;
+		expiration(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 		getComboCost(
 			level: BigNumberish,
@@ -963,18 +1028,22 @@ export class ResourcePayment extends BaseContract {
 		): Promise<BigNumber>;
 
 		getUpgradeExchange(
-			buyer: string,
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
-		isExpired(buyer: string, overrides?: CallOverrides): Promise<boolean>;
+		isExpired(to: string, overrides?: CallOverrides): Promise<boolean>;
 
 		lock(overrides?: CallOverrides): Promise<void>;
 
-		maxTotalRenewExpiration(overrides?: CallOverrides): Promise<BigNumber>;
+		maxTotalRenewExpiration(
+			to: string,
+			overrides?: CallOverrides
+		): Promise<BigNumber>;
 
 		maxTotalUpgradeExpiration(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
@@ -990,6 +1059,7 @@ export class ResourcePayment extends BaseContract {
 				BigNumber,
 				BigNumber,
 				BigNumber,
+				BigNumber,
 				[BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 					bandwidth: BigNumber;
 					storageAmount: BigNumber;
@@ -1000,9 +1070,10 @@ export class ResourcePayment extends BaseContract {
 				}
 			] & {
 				level: BigNumber;
-				cost: BigNumber;
 				boughtTime: BigNumber;
 				expiration: BigNumber;
+				expectedCost: BigNumber;
+				realCost: BigNumber;
 				combo: [BigNumber, BigNumber, BigNumber, BigNumber, boolean, string] & {
 					bandwidth: BigNumber;
 					storageAmount: BigNumber;
@@ -1017,6 +1088,7 @@ export class ResourcePayment extends BaseContract {
 		removeToken(index: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
 		renew(
+			to: string,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: CallOverrides
@@ -1066,9 +1138,15 @@ export class ResourcePayment extends BaseContract {
 		): Promise<void>;
 
 		upgrade(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			moreExpiration: BigNumberish,
+			overrides?: CallOverrides
+		): Promise<void>;
+
+		validateCombo(
+			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<void>;
 
@@ -1082,12 +1160,13 @@ export class ResourcePayment extends BaseContract {
 
 	filters: {
 		"Buy(address,tuple)"(
-			buyer?: string | null,
+			to?: string | null,
 			receipt?: null
 		): TypedEventFilter<
 			[
 				string,
 				[
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1102,9 +1181,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1123,8 +1203,9 @@ export class ResourcePayment extends BaseContract {
 				}
 			],
 			{
-				buyer: string;
+				to: string;
 				receipt: [
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1139,9 +1220,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1162,12 +1244,13 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		Buy(
-			buyer?: string | null,
+			to?: string | null,
 			receipt?: null
 		): TypedEventFilter<
 			[
 				string,
 				[
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1182,9 +1265,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1203,8 +1287,9 @@ export class ResourcePayment extends BaseContract {
 				}
 			],
 			{
-				buyer: string;
+				to: string;
 				receipt: [
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1219,9 +1304,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1258,12 +1344,13 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		"Renew(address,tuple)"(
-			buyer?: string | null,
+			to?: string | null,
 			receipt?: null
 		): TypedEventFilter<
 			[
 				string,
 				[
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1278,9 +1365,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1299,8 +1387,9 @@ export class ResourcePayment extends BaseContract {
 				}
 			],
 			{
-				buyer: string;
+				to: string;
 				receipt: [
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1315,9 +1404,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1338,12 +1428,13 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		Renew(
-			buyer?: string | null,
+			to?: string | null,
 			receipt?: null
 		): TypedEventFilter<
 			[
 				string,
 				[
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1358,9 +1449,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1379,8 +1471,9 @@ export class ResourcePayment extends BaseContract {
 				}
 			],
 			{
-				buyer: string;
+				to: string;
 				receipt: [
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1395,9 +1488,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1418,12 +1512,13 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		"Upgrade(address,tuple)"(
-			buyer?: string | null,
+			to?: string | null,
 			receipt?: null
 		): TypedEventFilter<
 			[
 				string,
 				[
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1438,9 +1533,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1459,8 +1555,9 @@ export class ResourcePayment extends BaseContract {
 				}
 			],
 			{
-				buyer: string;
+				to: string;
 				receipt: [
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1475,9 +1572,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1498,12 +1596,13 @@ export class ResourcePayment extends BaseContract {
 		>;
 
 		Upgrade(
-			buyer?: string | null,
+			to?: string | null,
 			receipt?: null
 		): TypedEventFilter<
 			[
 				string,
 				[
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1518,9 +1617,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1539,8 +1639,9 @@ export class ResourcePayment extends BaseContract {
 				}
 			],
 			{
-				buyer: string;
+				to: string;
 				receipt: [
+					BigNumber,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1555,9 +1656,10 @@ export class ResourcePayment extends BaseContract {
 					}
 				] & {
 					level: BigNumber;
-					cost: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
+					expectedCost: BigNumber;
+					realCost: BigNumber;
 					combo: [
 						BigNumber,
 						BigNumber,
@@ -1603,17 +1705,23 @@ export class ResourcePayment extends BaseContract {
 		beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
 
 		buy(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<BigNumber>;
 
-		canBuy(level: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+		canBuy(
+			to: string,
+			level: BigNumberish,
+			overrides?: CallOverrides
+		): Promise<BigNumber>;
 
-		canRenew(overrides?: CallOverrides): Promise<BigNumber>;
+		canRenew(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 		canUpgrade(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
@@ -1624,7 +1732,7 @@ export class ResourcePayment extends BaseContract {
 
 		combos(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-		expiration(buyer: string, overrides?: CallOverrides): Promise<BigNumber>;
+		expiration(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 		getComboCost(
 			level: BigNumberish,
@@ -1633,20 +1741,24 @@ export class ResourcePayment extends BaseContract {
 		): Promise<BigNumber>;
 
 		getUpgradeExchange(
-			buyer: string,
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
-		isExpired(buyer: string, overrides?: CallOverrides): Promise<BigNumber>;
+		isExpired(to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
 		lock(
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<BigNumber>;
 
-		maxTotalRenewExpiration(overrides?: CallOverrides): Promise<BigNumber>;
+		maxTotalRenewExpiration(
+			to: string,
+			overrides?: CallOverrides
+		): Promise<BigNumber>;
 
 		maxTotalUpgradeExpiration(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
@@ -1661,6 +1773,7 @@ export class ResourcePayment extends BaseContract {
 		): Promise<BigNumber>;
 
 		renew(
+			to: string,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
@@ -1714,10 +1827,16 @@ export class ResourcePayment extends BaseContract {
 		): Promise<BigNumber>;
 
 		upgrade(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			moreExpiration: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
+		): Promise<BigNumber>;
+
+		validateCombo(
+			level: BigNumberish,
+			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
 		withdraw(
@@ -1755,6 +1874,7 @@ export class ResourcePayment extends BaseContract {
 		beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
 		buy(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			expiration_: BigNumberish,
@@ -1762,13 +1882,18 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		canBuy(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
-		canRenew(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+		canRenew(
+			to: string,
+			overrides?: CallOverrides
+		): Promise<PopulatedTransaction>;
 
 		canUpgrade(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
@@ -1783,7 +1908,7 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		expiration(
-			buyer: string,
+			to: string,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
@@ -1794,13 +1919,13 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		getUpgradeExchange(
-			buyer: string,
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
 		isExpired(
-			buyer: string,
+			to: string,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
@@ -1809,10 +1934,12 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		maxTotalRenewExpiration(
+			to: string,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
 		maxTotalUpgradeExpiration(
+			to: string,
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
@@ -1830,6 +1957,7 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		renew(
+			to: string,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
@@ -1886,10 +2014,16 @@ export class ResourcePayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		upgrade(
+			to: string,
 			tokenIndex: BigNumberish,
 			level: BigNumberish,
 			moreExpiration: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
+		): Promise<PopulatedTransaction>;
+
+		validateCombo(
+			level: BigNumberish,
+			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
 		withdraw(
