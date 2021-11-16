@@ -28,12 +28,24 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { payment } from '@/factories'
 import { BigNumber } from 'ethers'
+import { UPDATE_COMBOS } from '@/store'
 
 @Component
 export default class Combos extends Vue {
 	selectedIndex = 0
 
 	async created() {
+		if (this.$store.state.combos.length == 0) {
+			const combos = []
+			const totalCombos = await payment.comboLength()
+			const l = totalCombos.toNumber()
+			for (let i = 0; i < l; i++) {
+				const combo = await payment.combos(i)
+				combos.push({ level: i, ...combo })
+			}
+			console.log('combos', combos)
+			this.$store.commit(UPDATE_COMBOS, combos)
+		}
 		this.$emit('onComboChanged', this.combos[this.selectedIndex])
 	}
 

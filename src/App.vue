@@ -55,8 +55,7 @@ import { payment, erc20, provider } from '@/factories'
 @Component
 export default class App extends Vue {
 	async created() {
-		this.initExpirations()
-		this.checkState()
+		await this.checkState()
 		this.listen()
 	}
 
@@ -78,44 +77,12 @@ export default class App extends Vue {
 	async checkState() {
 		if (window.ethereum) {
 			this.initExpirations()
-			await this.initTokens()
-			await this.initCombos()
 			const signer = provider.getSigner()
 			const account = await signer.getAddress()
 			const chainId = await signer.getChainId()
 			this.$store.commit(UPDATE_ACCOUNT, account)
 			this.$store.commit(UPDATE_CHAINID, chainId)
 		}
-	}
-
-	async initTokens() {
-		const totalTokens = await payment.tokenLength()
-		let l = totalTokens.toNumber()
-		const tokens = []
-		for (let i = 0; i < l; i++) {
-			let address = await payment.tokens(i)
-			const erc = erc20(address)
-			const name = await erc.name()
-			const symbol = await erc.symbol()
-			tokens.push({
-				index: i,
-				name,
-				symbol,
-				address,
-			})
-		}
-		this.$store.commit(UPDATE_TOKENS, tokens)
-	}
-
-	async initCombos() {
-		const combos = []
-		const totalCombos = await payment.comboLength()
-		const l = totalCombos.toNumber()
-		for (let i = 0; i < l; i++) {
-			const combo = await payment.combos(i)
-			combos.push({ level: i, ...combo })
-		}
-		this.$store.commit(UPDATE_COMBOS, combos)
 	}
 
 	async connect() {

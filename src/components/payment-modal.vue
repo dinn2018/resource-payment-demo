@@ -81,6 +81,9 @@ export default class PaymentModal extends Vue {
 
 	@Watch('show')
 	onShow(newValue: boolean) {
+		if (!this.selectedToken) {
+			this.selectedToken = this.$store.state.tokens[0]
+		}
 		this.visible = newValue
 		this.updateBtn()
 	}
@@ -94,6 +97,10 @@ export default class PaymentModal extends Vue {
 	@Watch('combo')
 	async comboChanged(c: Entity.Combo) {
 		await this.handleExpirationChange(this.selectedExpiration)
+	}
+
+	mounted() {
+		console.log('mounted')
 	}
 
 	async handleTokenChange(token: Entity.Token) {
@@ -150,6 +157,7 @@ export default class PaymentModal extends Vue {
 				data,
 			})
 			await tx.wait()
+			this.updateBtn()
 		} catch (e) {
 			this.popError(e)
 		}

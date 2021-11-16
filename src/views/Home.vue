@@ -40,7 +40,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { BigNumber } from 'ethers'
 import { payment, provider } from '@/factories'
-import moment from 'moment'
 import Combos from '@/components/combos.vue'
 import PaymentModal from '@/components/payment-modal.vue'
 import RenewModal from '@/components/renew-modal.vue'
