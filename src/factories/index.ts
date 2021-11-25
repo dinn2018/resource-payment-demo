@@ -1,11 +1,11 @@
 import { providers } from 'ethers'
-import { ResourcePayment__factory } from './ResourcePayment__factory'
+import { HostingPayment__factory } from './HostingPayment__factory'
 import { ERC20__factory } from './ERC20__factory'
 import { ERC20 } from './ERC20'
 
-const paymentAddress = '0x7D7E6269A0C1E8A7A4b27640420Cfaf96e7225bb'
+const paymentAddress = '0xb2314Ec9F4aE52aE04f4bcb82c5C03F8A0D6Cad9'
 const provider = new providers.Web3Provider(window.ethereum as any)
-const payment = ResourcePayment__factory.connect(
+const payment = HostingPayment__factory.connect(
 	paymentAddress,
 	provider
 )

@@ -45,7 +45,7 @@ import Tokens from '@/components/tokens.vue'
 import Expirations from '@/components/expirations.vue'
 
 import { BigNumber } from 'ethers'
-import { formatToken, uint256Max } from '@/utils'
+import { addressToUUID, formatToken, uint256Max } from '@/utils'
 
 @Component({
 	components: {
@@ -84,7 +84,8 @@ export default class RenewModal extends Vue {
 
 	async created() {
 		const signer = provider.getSigner()
-		const from = await signer.getAddress()
+		let from = await signer.getAddress()
+		from = addressToUUID(from)
 		const max = await payment.maxTotalRenewExpiration(from)
 		this.maxRenewExp = max.toNumber()
 	}
@@ -118,7 +119,7 @@ export default class RenewModal extends Vue {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('renew', [
-				from,
+				addressToUUID(from),
 				this.selectedToken.index,
 				this.selectedExpiration.value,
 			])
@@ -147,7 +148,8 @@ export default class RenewModal extends Vue {
 	async handleExpirationChange(exp: Entity.Expiration) {
 		this.selectedExpiration = exp
 		const signer = provider.getSigner()
-		const from = await signer.getAddress()
+		let from = await signer.getAddress()
+		from = addressToUUID(from)
 		const receipts = await payment.receipts(from)
 		const combo = await payment.combos(receipts.level)
 		if (combo.isValid) {

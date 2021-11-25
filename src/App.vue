@@ -43,15 +43,10 @@
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import {
-	UPDATE_ACCOUNT,
-	UPDATE_CHAINID,
-	UPDATE_COMBOS,
-	UPDATE_EXPIRATIONS,
-	UPDATE_TOKENS,
-} from '@/store'
+import { UPDATE_ACCOUNT, UPDATE_CHAINID, UPDATE_EXPIRATIONS } from '@/store'
 import { formatNetwork, isNetworkSupported } from '@/utils'
-import { payment, erc20, provider } from '@/factories'
+import { provider } from '@/factories'
+
 @Component
 export default class App extends Vue {
 	async created() {
@@ -109,8 +104,7 @@ export default class App extends Vue {
 				method: 'eth_requestAccounts',
 			})
 		}
-
-		await this.checkState()
+		window.location.reload()
 	}
 
 	initExpirations() {

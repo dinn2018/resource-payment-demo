@@ -43,7 +43,6 @@ export default class Combos extends Vue {
 				const combo = await payment.combos(i)
 				combos.push({ level: i, ...combo })
 			}
-			console.log('combos', combos)
 			this.$store.commit(UPDATE_COMBOS, combos)
 		}
 		this.$emit('onComboChanged', this.combos[this.selectedIndex])

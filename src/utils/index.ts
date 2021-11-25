@@ -44,8 +44,14 @@ export const formatNetwork = (chainId: number) => {
 }
 
 export const isNetworkSupported = (chainId: number) => {
-	return true //chainId == '0x5'
+	return chainId == 0x5
 }
 
+export const addressToUUID = (address: string) => {
+	if (address.startsWith('0x')) {
+		address = address.substr(2)
+	}
+	return '0x' + address.padStart(56, '0')
+}
 
 export const uint256Max = BigNumber.from('1').shl(256).sub(1)

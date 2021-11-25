@@ -52,7 +52,7 @@
 import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
 import { payment, erc20, paymentAddress, provider } from '@/factories'
 import { BigNumber } from 'ethers'
-import { formatToken, uint256Max } from '@/utils'
+import { addressToUUID, formatToken, uint256Max } from '@/utils'
 import Tokens from '@/components/tokens.vue'
 import Expirations from '@/components/expirations.vue'
 
@@ -99,10 +99,6 @@ export default class PaymentModal extends Vue {
 		await this.handleExpirationChange(this.selectedExpiration)
 	}
 
-	mounted() {
-		console.log('mounted')
-	}
-
 	async handleTokenChange(token: Entity.Token) {
 		this.selectedToken = token
 		await this.updateBtn()
@@ -145,7 +141,7 @@ export default class PaymentModal extends Vue {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('buy', [
-				from,
+				addressToUUID(from),
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
@@ -168,7 +164,7 @@ export default class PaymentModal extends Vue {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('upgrade', [
-				from,
+				addressToUUID(from),
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
@@ -187,7 +183,8 @@ export default class PaymentModal extends Vue {
 
 	async updateBtn() {
 		const signer = provider.getSigner()
-		const from = await signer.getAddress()
+		let from = await signer.getAddress()
+		from = addressToUUID(from)
 		this.canBuy = await payment.canBuy(from, this.combo?.level ?? 0)
 		this.canUpgrade = await payment.canUpgrade(from, this.combo?.level ?? 0)
 		this.checkApprove()
@@ -197,7 +194,8 @@ export default class PaymentModal extends Vue {
 	async exchangedUpgradeExp() {
 		if (this.canUpgrade) {
 			const signer = provider.getSigner()
-			const from = await signer.getAddress()
+			let from = await signer.getAddress()
+			from = addressToUUID(from)
 			const upgraded = await payment.getUpgradeExchange(
 				from,
 				this.combo?.level ?? 0

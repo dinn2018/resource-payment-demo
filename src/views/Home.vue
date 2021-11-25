@@ -40,6 +40,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { BigNumber } from 'ethers'
 import { payment, provider } from '@/factories'
+import { addressToUUID } from '@/utils'
 import Combos from '@/components/combos.vue'
 import PaymentModal from '@/components/payment-modal.vue'
 import RenewModal from '@/components/renew-modal.vue'
@@ -80,14 +81,17 @@ export default class Home extends Vue {
 	}
 
 	async updateExpiration() {
-		const account = await provider.getSigner().getAddress()
-		const expiration = await payment.expiration(account)
+		const signer = provider.getSigner()
+		let from = await signer.getAddress()
+		from = addressToUUID(from)
+		const expiration = await payment.expiration(from)
 		this.expiration = expiration.toNumber()
 	}
 
 	async updateCanRenew() {
 		const signer = provider.getSigner()
-		const from = await signer.getAddress()
+		let from = await signer.getAddress()
+		from = addressToUUID(from)
 		this.canRenew = await payment.canRenew(from)
 	}
 
