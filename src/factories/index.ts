@@ -3,7 +3,7 @@ import { HostingPayment__factory } from './HostingPayment__factory'
 import { ERC20__factory } from './ERC20__factory'
 import { ERC20 } from './ERC20'
 
-const paymentAddress = '0xb2314Ec9F4aE52aE04f4bcb82c5C03F8A0D6Cad9'
+const paymentAddress = '0x4663B1fC1180B28D9D158E79FD87830477dBAdD6'
 const provider = new providers.Web3Provider(window.ethereum as any)
 const payment = HostingPayment__factory.connect(
 	paymentAddress,

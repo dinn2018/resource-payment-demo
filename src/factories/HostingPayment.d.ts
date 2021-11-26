@@ -321,6 +321,7 @@ export type BuyEvent = TypedEvent<
 		string,
 		string,
 		[
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -335,6 +336,7 @@ export type BuyEvent = TypedEvent<
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -354,6 +356,7 @@ export type BuyEvent = TypedEvent<
 		serviceId_: string;
 		uuid: string;
 		receipt: [
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -368,6 +371,7 @@ export type BuyEvent = TypedEvent<
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -395,6 +399,7 @@ export type RenewEvent = TypedEvent<
 		string,
 		string,
 		[
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -409,6 +414,7 @@ export type RenewEvent = TypedEvent<
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -428,6 +434,7 @@ export type RenewEvent = TypedEvent<
 		serviceId_: string;
 		uuid: string;
 		receipt: [
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -442,6 +449,7 @@ export type RenewEvent = TypedEvent<
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -465,6 +473,7 @@ export type UpgradeEvent = TypedEvent<
 		string,
 		string,
 		[
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -479,6 +488,7 @@ export type UpgradeEvent = TypedEvent<
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -498,6 +508,7 @@ export type UpgradeEvent = TypedEvent<
 		serviceId_: string;
 		uuid: string;
 		receipt: [
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -512,6 +523,7 @@ export type UpgradeEvent = TypedEvent<
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -686,6 +698,7 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<
 			[
+				string,
 				BigNumber,
 				BigNumber,
 				BigNumber,
@@ -700,6 +713,7 @@ export class HostingPayment extends BaseContract {
 					name: string;
 				}
 			] & {
+				to: string;
 				level: BigNumber;
 				boughtTime: BigNumber;
 				expiration: BigNumber;
@@ -903,6 +917,7 @@ export class HostingPayment extends BaseContract {
 		overrides?: CallOverrides
 	): Promise<
 		[
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -917,6 +932,7 @@ export class HostingPayment extends BaseContract {
 				name: string;
 			}
 		] & {
+			to: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -1115,6 +1131,7 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<
 			[
+				string,
 				BigNumber,
 				BigNumber,
 				BigNumber,
@@ -1129,6 +1146,7 @@ export class HostingPayment extends BaseContract {
 					name: string;
 				}
 			] & {
+				to: string;
 				level: BigNumber;
 				boughtTime: BigNumber;
 				expiration: BigNumber;
@@ -1221,7 +1239,7 @@ export class HostingPayment extends BaseContract {
 	filters: {
 		"Buy(bytes2,bytes2,bytes28,tuple)"(
 			gId_?: BytesLike | null,
-			serviceId_?: null,
+			serviceId_?: BytesLike | null,
 			uuid?: BytesLike | null,
 			receipt?: null
 		): TypedEventFilter<
@@ -1230,6 +1248,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				string,
 				[
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1244,6 +1263,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1271,6 +1291,7 @@ export class HostingPayment extends BaseContract {
 				serviceId_: string;
 				uuid: string;
 				receipt: [
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1285,6 +1306,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1311,7 +1333,7 @@ export class HostingPayment extends BaseContract {
 
 		Buy(
 			gId_?: BytesLike | null,
-			serviceId_?: null,
+			serviceId_?: BytesLike | null,
 			uuid?: BytesLike | null,
 			receipt?: null
 		): TypedEventFilter<
@@ -1320,6 +1342,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				string,
 				[
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1334,6 +1357,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1361,6 +1385,7 @@ export class HostingPayment extends BaseContract {
 				serviceId_: string;
 				uuid: string;
 				receipt: [
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1375,6 +1400,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1417,7 +1443,7 @@ export class HostingPayment extends BaseContract {
 
 		"Renew(bytes2,bytes2,bytes28,tuple)"(
 			gId_?: BytesLike | null,
-			serviceId_?: null,
+			serviceId_?: BytesLike | null,
 			uuid?: BytesLike | null,
 			receipt?: null
 		): TypedEventFilter<
@@ -1426,6 +1452,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				string,
 				[
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1440,6 +1467,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1467,6 +1495,7 @@ export class HostingPayment extends BaseContract {
 				serviceId_: string;
 				uuid: string;
 				receipt: [
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1481,6 +1510,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1507,7 +1537,7 @@ export class HostingPayment extends BaseContract {
 
 		Renew(
 			gId_?: BytesLike | null,
-			serviceId_?: null,
+			serviceId_?: BytesLike | null,
 			uuid?: BytesLike | null,
 			receipt?: null
 		): TypedEventFilter<
@@ -1516,6 +1546,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				string,
 				[
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1530,6 +1561,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1557,6 +1589,7 @@ export class HostingPayment extends BaseContract {
 				serviceId_: string;
 				uuid: string;
 				receipt: [
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1571,6 +1604,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1597,7 +1631,7 @@ export class HostingPayment extends BaseContract {
 
 		"Upgrade(bytes2,bytes2,bytes28,tuple)"(
 			gId_?: BytesLike | null,
-			serviceId_?: null,
+			serviceId_?: BytesLike | null,
 			uuid?: BytesLike | null,
 			receipt?: null
 		): TypedEventFilter<
@@ -1606,6 +1640,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				string,
 				[
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1620,6 +1655,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1647,6 +1683,7 @@ export class HostingPayment extends BaseContract {
 				serviceId_: string;
 				uuid: string;
 				receipt: [
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1661,6 +1698,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1687,7 +1725,7 @@ export class HostingPayment extends BaseContract {
 
 		Upgrade(
 			gId_?: BytesLike | null,
-			serviceId_?: null,
+			serviceId_?: BytesLike | null,
 			uuid?: BytesLike | null,
 			receipt?: null
 		): TypedEventFilter<
@@ -1696,6 +1734,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				string,
 				[
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1710,6 +1749,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1737,6 +1777,7 @@ export class HostingPayment extends BaseContract {
 				serviceId_: string;
 				uuid: string;
 				receipt: [
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1751,6 +1792,7 @@ export class HostingPayment extends BaseContract {
 						name: string;
 					}
 				] & {
+					to: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
