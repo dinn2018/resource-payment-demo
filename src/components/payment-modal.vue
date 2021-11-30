@@ -141,7 +141,7 @@ export default class PaymentModal extends Vue {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('buy', [
-				addressToUUID(from),
+				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d',
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
@@ -164,7 +164,7 @@ export default class PaymentModal extends Vue {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
 			const data = payment.interface.encodeFunctionData('upgrade', [
-				addressToUUID(from),
+				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d',
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
@@ -184,7 +184,7 @@ export default class PaymentModal extends Vue {
 	async updateBtn() {
 		const signer = provider.getSigner()
 		let from = await signer.getAddress()
-		from = addressToUUID(from)
+		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
 		this.canBuy = await payment.canBuy(from, this.combo?.level ?? 0)
 		this.canUpgrade = await payment.canUpgrade(from, this.combo?.level ?? 0)
 		this.checkApprove()
@@ -195,7 +195,7 @@ export default class PaymentModal extends Vue {
 		if (this.canUpgrade) {
 			const signer = provider.getSigner()
 			let from = await signer.getAddress()
-			from = addressToUUID(from)
+			from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
 			const upgraded = await payment.getUpgradeExchange(
 				from,
 				this.combo?.level ?? 0

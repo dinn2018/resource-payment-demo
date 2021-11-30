@@ -85,7 +85,7 @@ export default class RenewModal extends Vue {
 	async created() {
 		const signer = provider.getSigner()
 		let from = await signer.getAddress()
-		from = addressToUUID(from)
+		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
 		const max = await payment.maxTotalRenewExpiration(from)
 		this.maxRenewExp = max.toNumber()
 	}
@@ -118,8 +118,12 @@ export default class RenewModal extends Vue {
 		try {
 			const signer = provider.getSigner()
 			const from = await signer.getAddress()
+			const nonce = await payment.nonces(
+				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
+			)
 			const data = payment.interface.encodeFunctionData('renew', [
-				addressToUUID(from),
+				nonce,
+				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d',
 				this.selectedToken.index,
 				this.selectedExpiration.value,
 			])
@@ -149,7 +153,7 @@ export default class RenewModal extends Vue {
 		this.selectedExpiration = exp
 		const signer = provider.getSigner()
 		let from = await signer.getAddress()
-		from = addressToUUID(from)
+		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
 		const receipts = await payment.receipts(from)
 		const combo = await payment.combos(receipts.level)
 		if (combo.isValid) {

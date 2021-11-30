@@ -43,10 +43,11 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		"maxTotalRenewExpiration(bytes28)": FunctionFragment;
 		"maxTotalUpgradeExpiration(bytes28,uint256)": FunctionFragment;
 		"mintStorage()": FunctionFragment;
+		"nonces(bytes28)": FunctionFragment;
 		"owner()": FunctionFragment;
 		"receipts(bytes28)": FunctionFragment;
 		"removeToken(uint256)": FunctionFragment;
-		"renew(bytes28,uint256,uint256)": FunctionFragment;
+		"renew(uint256,bytes28,uint256,uint256)": FunctionFragment;
 		"renounceOwnership()": FunctionFragment;
 		"serviceId()": FunctionFragment;
 		"setMaxTotalExpriation(uint256)": FunctionFragment;
@@ -141,6 +142,7 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		functionFragment: "mintStorage",
 		values?: undefined
 	): string;
+	encodeFunctionData(functionFragment: "nonces", values: [BytesLike]): string;
 	encodeFunctionData(functionFragment: "owner", values?: undefined): string;
 	encodeFunctionData(functionFragment: "receipts", values: [BytesLike]): string;
 	encodeFunctionData(
@@ -149,7 +151,7 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 	): string;
 	encodeFunctionData(
 		functionFragment: "renew",
-		values: [BytesLike, BigNumberish, BigNumberish]
+		values: [BigNumberish, BytesLike, BigNumberish, BigNumberish]
 	): string;
 	encodeFunctionData(
 		functionFragment: "renounceOwnership",
@@ -257,6 +259,7 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		functionFragment: "mintStorage",
 		data: BytesLike
 	): Result;
+	decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "receipts", data: BytesLike): Result;
 	decodeFunctionResult(
@@ -322,6 +325,7 @@ export type BuyEvent = TypedEvent<
 		string,
 		[
 			string,
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -337,6 +341,7 @@ export type BuyEvent = TypedEvent<
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -357,6 +362,7 @@ export type BuyEvent = TypedEvent<
 		uuid: string;
 		receipt: [
 			string,
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -372,6 +378,7 @@ export type BuyEvent = TypedEvent<
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -400,6 +407,7 @@ export type RenewEvent = TypedEvent<
 		string,
 		[
 			string,
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -415,6 +423,7 @@ export type RenewEvent = TypedEvent<
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -435,6 +444,7 @@ export type RenewEvent = TypedEvent<
 		uuid: string;
 		receipt: [
 			string,
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -450,6 +460,7 @@ export type RenewEvent = TypedEvent<
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -474,6 +485,7 @@ export type UpgradeEvent = TypedEvent<
 		string,
 		[
 			string,
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -489,6 +501,7 @@ export type UpgradeEvent = TypedEvent<
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -509,6 +522,7 @@ export type UpgradeEvent = TypedEvent<
 		uuid: string;
 		receipt: [
 			string,
+			string,
 			BigNumber,
 			BigNumber,
 			BigNumber,
@@ -524,6 +538,7 @@ export type UpgradeEvent = TypedEvent<
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -691,6 +706,8 @@ export class HostingPayment extends BaseContract {
 
 		mintStorage(overrides?: CallOverrides): Promise<[string]>;
 
+		nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<[BigNumber]>;
+
 		owner(overrides?: CallOverrides): Promise<[string]>;
 
 		receipts(
@@ -698,6 +715,7 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<
 			[
+				string,
 				string,
 				BigNumber,
 				BigNumber,
@@ -714,6 +732,7 @@ export class HostingPayment extends BaseContract {
 				}
 			] & {
 				to: string;
+				token: string;
 				level: BigNumber;
 				boughtTime: BigNumber;
 				expiration: BigNumber;
@@ -736,6 +755,7 @@ export class HostingPayment extends BaseContract {
 		): Promise<ContractTransaction>;
 
 		renew(
+			nonce: BigNumberish,
 			uuid: BytesLike,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
@@ -910,6 +930,8 @@ export class HostingPayment extends BaseContract {
 
 	mintStorage(overrides?: CallOverrides): Promise<string>;
 
+	nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
 	owner(overrides?: CallOverrides): Promise<string>;
 
 	receipts(
@@ -917,6 +939,7 @@ export class HostingPayment extends BaseContract {
 		overrides?: CallOverrides
 	): Promise<
 		[
+			string,
 			string,
 			BigNumber,
 			BigNumber,
@@ -933,6 +956,7 @@ export class HostingPayment extends BaseContract {
 			}
 		] & {
 			to: string;
+			token: string;
 			level: BigNumber;
 			boughtTime: BigNumber;
 			expiration: BigNumber;
@@ -955,6 +979,7 @@ export class HostingPayment extends BaseContract {
 	): Promise<ContractTransaction>;
 
 	renew(
+		nonce: BigNumberish,
 		uuid: BytesLike,
 		tokenIndex: BigNumberish,
 		expiration_: BigNumberish,
@@ -1124,6 +1149,8 @@ export class HostingPayment extends BaseContract {
 
 		mintStorage(overrides?: CallOverrides): Promise<string>;
 
+		nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
 		owner(overrides?: CallOverrides): Promise<string>;
 
 		receipts(
@@ -1131,6 +1158,7 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<
 			[
+				string,
 				string,
 				BigNumber,
 				BigNumber,
@@ -1147,6 +1175,7 @@ export class HostingPayment extends BaseContract {
 				}
 			] & {
 				to: string;
+				token: string;
 				level: BigNumber;
 				boughtTime: BigNumber;
 				expiration: BigNumber;
@@ -1166,6 +1195,7 @@ export class HostingPayment extends BaseContract {
 		removeToken(index: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
 		renew(
+			nonce: BigNumberish,
 			uuid: BytesLike,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
@@ -1249,6 +1279,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				[
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1264,6 +1295,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1292,6 +1324,7 @@ export class HostingPayment extends BaseContract {
 				uuid: string;
 				receipt: [
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1307,6 +1340,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1343,6 +1377,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				[
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1358,6 +1393,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1386,6 +1422,7 @@ export class HostingPayment extends BaseContract {
 				uuid: string;
 				receipt: [
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1401,6 +1438,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1453,6 +1491,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				[
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1468,6 +1507,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1496,6 +1536,7 @@ export class HostingPayment extends BaseContract {
 				uuid: string;
 				receipt: [
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1511,6 +1552,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1547,6 +1589,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				[
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1562,6 +1605,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1590,6 +1634,7 @@ export class HostingPayment extends BaseContract {
 				uuid: string;
 				receipt: [
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1605,6 +1650,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1641,6 +1687,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				[
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1656,6 +1703,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1684,6 +1732,7 @@ export class HostingPayment extends BaseContract {
 				uuid: string;
 				receipt: [
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1699,6 +1748,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1735,6 +1785,7 @@ export class HostingPayment extends BaseContract {
 				string,
 				[
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1750,6 +1801,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1778,6 +1830,7 @@ export class HostingPayment extends BaseContract {
 				uuid: string;
 				receipt: [
 					string,
+					string,
 					BigNumber,
 					BigNumber,
 					BigNumber,
@@ -1793,6 +1846,7 @@ export class HostingPayment extends BaseContract {
 					}
 				] & {
 					to: string;
+					token: string;
 					level: BigNumber;
 					boughtTime: BigNumber;
 					expiration: BigNumber;
@@ -1910,6 +1964,8 @@ export class HostingPayment extends BaseContract {
 
 		mintStorage(overrides?: CallOverrides): Promise<BigNumber>;
 
+		nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
 		owner(overrides?: CallOverrides): Promise<BigNumber>;
 
 		receipts(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
@@ -1920,6 +1976,7 @@ export class HostingPayment extends BaseContract {
 		): Promise<BigNumber>;
 
 		renew(
+			nonce: BigNumberish,
 			uuid: BytesLike,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
@@ -2103,6 +2160,11 @@ export class HostingPayment extends BaseContract {
 
 		mintStorage(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+		nonces(
+			arg0: BytesLike,
+			overrides?: CallOverrides
+		): Promise<PopulatedTransaction>;
+
 		owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
 		receipts(
@@ -2116,6 +2178,7 @@ export class HostingPayment extends BaseContract {
 		): Promise<PopulatedTransaction>;
 
 		renew(
+			nonce: BigNumberish,
 			uuid: BytesLike,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,

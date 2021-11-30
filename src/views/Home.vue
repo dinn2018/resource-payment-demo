@@ -83,7 +83,7 @@ export default class Home extends Vue {
 	async updateExpiration() {
 		const signer = provider.getSigner()
 		let from = await signer.getAddress()
-		from = addressToUUID(from)
+		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
 		const expiration = await payment.expiration(from)
 		this.expiration = expiration.toNumber()
 	}
@@ -91,7 +91,7 @@ export default class Home extends Vue {
 	async updateCanRenew() {
 		const signer = provider.getSigner()
 		let from = await signer.getAddress()
-		from = addressToUUID(from)
+		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
 		this.canRenew = await payment.canRenew(from)
 	}
 
