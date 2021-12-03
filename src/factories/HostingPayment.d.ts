@@ -29,7 +29,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		"canBuy(bytes28,uint256)": FunctionFragment;
 		"canRenew(bytes28)": FunctionFragment;
 		"canUpgrade(bytes28,uint256)": FunctionFragment;
-		"channel()": FunctionFragment;
 		"comboLength()": FunctionFragment;
 		"combos(uint256)": FunctionFragment;
 		"expiration(bytes28)": FunctionFragment;
@@ -42,20 +41,17 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		"lock()": FunctionFragment;
 		"maxTotalRenewExpiration(bytes28)": FunctionFragment;
 		"maxTotalUpgradeExpiration(bytes28,uint256)": FunctionFragment;
-		"mintStorage()": FunctionFragment;
 		"nonces(bytes28)": FunctionFragment;
 		"owner()": FunctionFragment;
 		"receipts(bytes28)": FunctionFragment;
 		"removeToken(uint256)": FunctionFragment;
 		"renew(uint256,bytes28,uint256,uint256)": FunctionFragment;
-		"renounceOwnership()": FunctionFragment;
 		"serviceId()": FunctionFragment;
 		"setMaxTotalExpriation(uint256)": FunctionFragment;
 		"setMinExpriation(uint256)": FunctionFragment;
 		"tokenLength()": FunctionFragment;
 		"tokens(uint256)": FunctionFragment;
 		"transferOwnership(address)": FunctionFragment;
-		"transferRootChannel(address)": FunctionFragment;
 		"unlock()": FunctionFragment;
 		"updateCombo(uint256,(uint256,uint256,uint256,uint256,bool,string))": FunctionFragment;
 		"upgrade(bytes28,uint256,uint256,uint256)": FunctionFragment;
@@ -98,7 +94,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		functionFragment: "canUpgrade",
 		values: [BytesLike, BigNumberish]
 	): string;
-	encodeFunctionData(functionFragment: "channel", values?: undefined): string;
 	encodeFunctionData(
 		functionFragment: "comboLength",
 		values?: undefined
@@ -138,10 +133,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		functionFragment: "maxTotalUpgradeExpiration",
 		values: [BytesLike, BigNumberish]
 	): string;
-	encodeFunctionData(
-		functionFragment: "mintStorage",
-		values?: undefined
-	): string;
 	encodeFunctionData(functionFragment: "nonces", values: [BytesLike]): string;
 	encodeFunctionData(functionFragment: "owner", values?: undefined): string;
 	encodeFunctionData(functionFragment: "receipts", values: [BytesLike]): string;
@@ -152,10 +143,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 	encodeFunctionData(
 		functionFragment: "renew",
 		values: [BigNumberish, BytesLike, BigNumberish, BigNumberish]
-	): string;
-	encodeFunctionData(
-		functionFragment: "renounceOwnership",
-		values?: undefined
 	): string;
 	encodeFunctionData(functionFragment: "serviceId", values?: undefined): string;
 	encodeFunctionData(
@@ -176,10 +163,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 	): string;
 	encodeFunctionData(
 		functionFragment: "transferOwnership",
-		values: [string]
-	): string;
-	encodeFunctionData(
-		functionFragment: "transferRootChannel",
 		values: [string]
 	): string;
 	encodeFunctionData(functionFragment: "unlock", values?: undefined): string;
@@ -224,7 +207,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 	decodeFunctionResult(functionFragment: "canBuy", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "canRenew", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "canUpgrade", data: BytesLike): Result;
-	decodeFunctionResult(functionFragment: "channel", data: BytesLike): Result;
 	decodeFunctionResult(
 		functionFragment: "comboLength",
 		data: BytesLike
@@ -255,10 +237,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		functionFragment: "maxTotalUpgradeExpiration",
 		data: BytesLike
 	): Result;
-	decodeFunctionResult(
-		functionFragment: "mintStorage",
-		data: BytesLike
-	): Result;
 	decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
 	decodeFunctionResult(functionFragment: "receipts", data: BytesLike): Result;
@@ -267,10 +245,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		data: BytesLike
 	): Result;
 	decodeFunctionResult(functionFragment: "renew", data: BytesLike): Result;
-	decodeFunctionResult(
-		functionFragment: "renounceOwnership",
-		data: BytesLike
-	): Result;
 	decodeFunctionResult(functionFragment: "serviceId", data: BytesLike): Result;
 	decodeFunctionResult(
 		functionFragment: "setMaxTotalExpriation",
@@ -289,10 +263,6 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 		functionFragment: "transferOwnership",
 		data: BytesLike
 	): Result;
-	decodeFunctionResult(
-		functionFragment: "transferRootChannel",
-		data: BytesLike
-	): Result;
 	decodeFunctionResult(functionFragment: "unlock", data: BytesLike): Result;
 	decodeFunctionResult(
 		functionFragment: "updateCombo",
@@ -307,13 +277,11 @@ interface HostingPaymentInterface extends ethers.utils.Interface {
 
 	events: {
 		"Buy(bytes2,bytes2,bytes28,tuple)": EventFragment;
-		"OwnershipTransferred(address,address)": EventFragment;
 		"Renew(bytes2,bytes2,bytes28,tuple)": EventFragment;
 		"Upgrade(bytes2,bytes2,bytes28,tuple)": EventFragment;
 	};
 
 	getEvent(nameOrSignatureOrTopic: "Buy"): EventFragment;
-	getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 	getEvent(nameOrSignatureOrTopic: "Renew"): EventFragment;
 	getEvent(nameOrSignatureOrTopic: "Upgrade"): EventFragment;
 }
@@ -394,10 +362,6 @@ export type BuyEvent = TypedEvent<
 			};
 		};
 	}
->;
-
-export type OwnershipTransferredEvent = TypedEvent<
-	[string, string] & { previousOwner: string; newOwner: string }
 >;
 
 export type RenewEvent = TypedEvent<
@@ -643,8 +607,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<[boolean]>;
 
-		channel(overrides?: CallOverrides): Promise<[string]>;
-
 		comboLength(overrides?: CallOverrides): Promise<[BigNumber]>;
 
 		combos(
@@ -704,8 +666,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<[BigNumber]>;
 
-		mintStorage(overrides?: CallOverrides): Promise<[string]>;
-
 		nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<[BigNumber]>;
 
 		owner(overrides?: CallOverrides): Promise<[string]>;
@@ -762,10 +722,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
 
-		renounceOwnership(
-			overrides?: Overrides & { from?: string | Promise<string> }
-		): Promise<ContractTransaction>;
-
 		serviceId(overrides?: CallOverrides): Promise<[string]>;
 
 		setMaxTotalExpriation(
@@ -784,11 +740,6 @@ export class HostingPayment extends BaseContract {
 
 		transferOwnership(
 			newOwner: string,
-			overrides?: Overrides & { from?: string | Promise<string> }
-		): Promise<ContractTransaction>;
-
-		transferRootChannel(
-			_channel: string,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
 
@@ -825,7 +776,7 @@ export class HostingPayment extends BaseContract {
 		withdraw(
 			token: string,
 			to: string,
-			amount: BigNumberish,
+			value: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<ContractTransaction>;
 	};
@@ -872,8 +823,6 @@ export class HostingPayment extends BaseContract {
 		level: BigNumberish,
 		overrides?: CallOverrides
 	): Promise<boolean>;
-
-	channel(overrides?: CallOverrides): Promise<string>;
 
 	comboLength(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -927,8 +876,6 @@ export class HostingPayment extends BaseContract {
 		level: BigNumberish,
 		overrides?: CallOverrides
 	): Promise<BigNumber>;
-
-	mintStorage(overrides?: CallOverrides): Promise<string>;
 
 	nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -986,10 +933,6 @@ export class HostingPayment extends BaseContract {
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
 
-	renounceOwnership(
-		overrides?: Overrides & { from?: string | Promise<string> }
-	): Promise<ContractTransaction>;
-
 	serviceId(overrides?: CallOverrides): Promise<string>;
 
 	setMaxTotalExpriation(
@@ -1008,11 +951,6 @@ export class HostingPayment extends BaseContract {
 
 	transferOwnership(
 		newOwner: string,
-		overrides?: Overrides & { from?: string | Promise<string> }
-	): Promise<ContractTransaction>;
-
-	transferRootChannel(
-		_channel: string,
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
 
@@ -1046,7 +984,7 @@ export class HostingPayment extends BaseContract {
 	withdraw(
 		token: string,
 		to: string,
-		amount: BigNumberish,
+		value: BigNumberish,
 		overrides?: Overrides & { from?: string | Promise<string> }
 	): Promise<ContractTransaction>;
 
@@ -1090,8 +1028,6 @@ export class HostingPayment extends BaseContract {
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<boolean>;
-
-		channel(overrides?: CallOverrides): Promise<string>;
 
 		comboLength(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1147,8 +1083,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
-		mintStorage(overrides?: CallOverrides): Promise<string>;
-
 		nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
 		owner(overrides?: CallOverrides): Promise<string>;
@@ -1202,8 +1136,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
-		renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
 		serviceId(overrides?: CallOverrides): Promise<string>;
 
 		setMaxTotalExpriation(
@@ -1222,11 +1154,6 @@ export class HostingPayment extends BaseContract {
 
 		transferOwnership(
 			newOwner: string,
-			overrides?: CallOverrides
-		): Promise<void>;
-
-		transferRootChannel(
-			_channel: string,
 			overrides?: CallOverrides
 		): Promise<void>;
 
@@ -1261,7 +1188,7 @@ export class HostingPayment extends BaseContract {
 		withdraw(
 			token: string,
 			to: string,
-			amount: BigNumberish,
+			value: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<void>;
 	};
@@ -1461,22 +1388,6 @@ export class HostingPayment extends BaseContract {
 					};
 				};
 			}
-		>;
-
-		"OwnershipTransferred(address,address)"(
-			previousOwner?: string | null,
-			newOwner?: string | null
-		): TypedEventFilter<
-			[string, string],
-			{ previousOwner: string; newOwner: string }
-		>;
-
-		OwnershipTransferred(
-			previousOwner?: string | null,
-			newOwner?: string | null
-		): TypedEventFilter<
-			[string, string],
-			{ previousOwner: string; newOwner: string }
 		>;
 
 		"Renew(bytes2,bytes2,bytes28,tuple)"(
@@ -1916,8 +1827,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
-		channel(overrides?: CallOverrides): Promise<BigNumber>;
-
 		comboLength(overrides?: CallOverrides): Promise<BigNumber>;
 
 		combos(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -1962,8 +1871,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<BigNumber>;
 
-		mintStorage(overrides?: CallOverrides): Promise<BigNumber>;
-
 		nonces(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
 		owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1980,10 +1887,6 @@ export class HostingPayment extends BaseContract {
 			uuid: BytesLike,
 			tokenIndex: BigNumberish,
 			expiration_: BigNumberish,
-			overrides?: Overrides & { from?: string | Promise<string> }
-		): Promise<BigNumber>;
-
-		renounceOwnership(
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<BigNumber>;
 
@@ -2005,11 +1908,6 @@ export class HostingPayment extends BaseContract {
 
 		transferOwnership(
 			newOwner: string,
-			overrides?: Overrides & { from?: string | Promise<string> }
-		): Promise<BigNumber>;
-
-		transferRootChannel(
-			_channel: string,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<BigNumber>;
 
@@ -2046,7 +1944,7 @@ export class HostingPayment extends BaseContract {
 		withdraw(
 			token: string,
 			to: string,
-			amount: BigNumberish,
+			value: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<BigNumber>;
 	};
@@ -2099,8 +1997,6 @@ export class HostingPayment extends BaseContract {
 			level: BigNumberish,
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
-
-		channel(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
 		comboLength(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2158,8 +2054,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: CallOverrides
 		): Promise<PopulatedTransaction>;
 
-		mintStorage(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
 		nonces(
 			arg0: BytesLike,
 			overrides?: CallOverrides
@@ -2185,10 +2079,6 @@ export class HostingPayment extends BaseContract {
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<PopulatedTransaction>;
 
-		renounceOwnership(
-			overrides?: Overrides & { from?: string | Promise<string> }
-		): Promise<PopulatedTransaction>;
-
 		serviceId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
 		setMaxTotalExpriation(
@@ -2210,11 +2100,6 @@ export class HostingPayment extends BaseContract {
 
 		transferOwnership(
 			newOwner: string,
-			overrides?: Overrides & { from?: string | Promise<string> }
-		): Promise<PopulatedTransaction>;
-
-		transferRootChannel(
-			_channel: string,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<PopulatedTransaction>;
 
@@ -2251,7 +2136,7 @@ export class HostingPayment extends BaseContract {
 		withdraw(
 			token: string,
 			to: string,
-			amount: BigNumberish,
+			value: BigNumberish,
 			overrides?: Overrides & { from?: string | Promise<string> }
 		): Promise<PopulatedTransaction>;
 	};

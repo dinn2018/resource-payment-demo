@@ -26,7 +26,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { payment } from '@/factories'
 import { BigNumber } from 'ethers'
 import { UPDATE_COMBOS } from '@/store'
 
@@ -37,10 +36,10 @@ export default class Combos extends Vue {
 	async created() {
 		if (this.$store.state.combos.length == 0) {
 			const combos = []
-			const totalCombos = await payment.comboLength()
+			const totalCombos = await this.payment().comboLength()
 			const l = totalCombos.toNumber()
 			for (let i = 0; i < l; i++) {
-				const combo = await payment.combos(i)
+				const combo = await this.payment().combos(i)
 				combos.push({ level: i, ...combo })
 			}
 			this.$store.commit(UPDATE_COMBOS, combos)
@@ -67,7 +66,7 @@ export default class Combos extends Vue {
 
 	async getCurrentLevel() {
 		const a = await this.getAccount()
-		const receipt = await payment.receipts(a)
+		const receipt = await this.payment().receipts(a)
 		return receipt.level.toNumber()
 	}
 

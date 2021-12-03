@@ -50,9 +50,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
-import { payment, erc20, paymentAddress, provider } from '@/factories'
 import { BigNumber } from 'ethers'
-import { addressToUUID, formatToken, uint256Max } from '@/utils'
+import { formatToken, uint256Max } from '@/utils'
 import Tokens from '@/components/tokens.vue'
 import Expirations from '@/components/expirations.vue'
 
@@ -106,9 +105,9 @@ export default class PaymentModal extends Vue {
 
 	async handleExpirationChange(exp: Entity.Expiration) {
 		this.selectedExpiration = exp
-		const combo = await payment.combos(this.combo?.level ?? 0)
+		const combo = await this.payment().combos(this.combo?.level ?? 0)
 		if (combo.isValid) {
-			this.cost = await payment.getComboCost(
+			this.cost = await this.payment().getComboCost(
 				this.combo?.level ?? 0,
 				this.selectedExpiration.value
 			)
@@ -117,13 +116,13 @@ export default class PaymentModal extends Vue {
 
 	async approve() {
 		try {
-			const erc = erc20(this.selectedToken.address)
+			const erc = this.erc20(this.selectedToken.address)
 			const data = erc.interface.encodeFunctionData('approve', [
-				paymentAddress,
+				this.paymentAddress,
 				uint256Max,
 			])
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
+			const signer = await this.signer()
+			const from = await this.account()
 			const tx = await signer.sendTransaction({
 				from,
 				to: this.selectedToken.address,
@@ -138,10 +137,10 @@ export default class PaymentModal extends Vue {
 
 	async buy() {
 		try {
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
-			const data = payment.interface.encodeFunctionData('buy', [
-				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d',
+			const signer = await this.signer()
+			const from = await this.account()
+			const data = this.payment().interface.encodeFunctionData('buy', [
+				'0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b',
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
@@ -149,7 +148,7 @@ export default class PaymentModal extends Vue {
 
 			const tx = await signer.sendTransaction({
 				from,
-				to: paymentAddress,
+				to: this.paymentAddress,
 				data,
 			})
 			await tx.wait()
@@ -161,17 +160,17 @@ export default class PaymentModal extends Vue {
 
 	async upgrade() {
 		try {
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
-			const data = payment.interface.encodeFunctionData('upgrade', [
-				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d',
+			const signer = await this.signer()
+			const from = await this.account()
+			const data = this.payment().interface.encodeFunctionData('upgrade', [
+				'0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b',
 				this.selectedToken.index,
 				this.combo.level,
 				this.selectedExpiration.value,
 			])
 			const tx = await signer.sendTransaction({
 				from,
-				to: paymentAddress,
+				to: this.paymentAddress,
 				data,
 			})
 			await tx.wait()
@@ -182,26 +181,25 @@ export default class PaymentModal extends Vue {
 	}
 
 	async updateBtn() {
-		const signer = provider.getSigner()
-		let from = await signer.getAddress()
-		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
-		this.canBuy = await payment.canBuy(from, this.combo?.level ?? 0)
-		this.canUpgrade = await payment.canUpgrade(from, this.combo?.level ?? 0)
+		const from = '0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b'
+		this.canBuy = await this.payment().canBuy(from, this.combo?.level ?? 0)
+		this.canUpgrade = await this.payment().canUpgrade(
+			from,
+			this.combo?.level ?? 0
+		)
 		this.checkApprove()
 		this.exchangedUpgradeExp()
 	}
 
 	async exchangedUpgradeExp() {
 		if (this.canUpgrade) {
-			const signer = provider.getSigner()
-			let from = await signer.getAddress()
-			from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
-			const upgraded = await payment.getUpgradeExchange(
+			const from = '0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b'
+			const upgraded = await this.payment().getUpgradeExchange(
 				from,
 				this.combo?.level ?? 0
 			)
 			this.upgradingExp = upgraded.toNumber()
-			const max = await payment.maxTotalUpgradeExpiration(
+			const max = await this.payment().maxTotalUpgradeExpiration(
 				from,
 				this.combo.level
 			)
@@ -219,10 +217,9 @@ export default class PaymentModal extends Vue {
 
 	async checkApprove() {
 		if (this.selectedToken) {
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
-			const erc = erc20(this.selectedToken.address)
-			const allowance = await erc.allowance(from, paymentAddress)
+			const from = await this.account()
+			const erc = this.erc20(this.selectedToken.address)
+			const allowance = await erc.allowance(from, this.paymentAddress)
 			const minAllowance = uint256Max.shr(1)
 			this.shouldApprove = allowance.lt(minAllowance)
 		}

@@ -40,12 +40,10 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator'
-import { payment, erc20, paymentAddress, provider } from '@/factories'
 import Tokens from '@/components/tokens.vue'
 import Expirations from '@/components/expirations.vue'
-
 import { BigNumber } from 'ethers'
-import { addressToUUID, formatToken, uint256Max } from '@/utils'
+import { formatToken, uint256Max } from '@/utils'
 
 @Component({
 	components: {
@@ -83,10 +81,8 @@ export default class RenewModal extends Vue {
 	}
 
 	async created() {
-		const signer = provider.getSigner()
-		let from = await signer.getAddress()
-		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
-		const max = await payment.maxTotalRenewExpiration(from)
+		const from = '0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b'
+		const max = await this.payment().maxTotalRenewExpiration(from)
 		this.maxRenewExp = max.toNumber()
 	}
 
@@ -96,13 +92,13 @@ export default class RenewModal extends Vue {
 
 	async approve() {
 		try {
-			const erc = erc20(this.selectedToken.address)
+			const erc = this.erc20(this.selectedToken.address)
 			const data = erc.interface.encodeFunctionData('approve', [
-				paymentAddress,
+				this.paymentAddress,
 				uint256Max,
 			])
-			const signer = provider.getSigner()
-			const from = await signer.getAddress()
+			const signer = await this.signer()
+			const from = await this.account()
 			const tx = await signer.sendTransaction({
 				from,
 				to: this.selectedToken.address,
@@ -116,20 +112,20 @@ export default class RenewModal extends Vue {
 
 	async renew() {
 		try {
-			const signer = provider.getSigner()
+			const signer = await this.signer()
 			const from = await signer.getAddress()
-			const nonce = await payment.nonces(
-				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
+			const nonce = await this.payment().nonces(
+				'0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b'
 			)
-			const data = payment.interface.encodeFunctionData('renew', [
+			const data = this.payment().interface.encodeFunctionData('renew', [
 				nonce,
-				'0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d',
+				'0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b',
 				this.selectedToken.index,
 				this.selectedExpiration.value,
 			])
 			const tx = await signer.sendTransaction({
 				from,
-				to: paymentAddress,
+				to: this.paymentAddress,
 				data,
 			})
 			await tx.wait()
@@ -140,10 +136,10 @@ export default class RenewModal extends Vue {
 
 	async checkApprove() {
 		if (this.selectedToken) {
-			const signer = provider.getSigner()
+			const signer = await this.signer()
 			const from = await signer.getAddress()
-			const erc = erc20(this.selectedToken.address)
-			const allowance = await erc.allowance(from, paymentAddress)
+			const erc = this.erc20(this.selectedToken.address)
+			const allowance = await erc.allowance(from, this.paymentAddress)
 			const minAllowance = uint256Max.shr(1)
 			this.shouldApprove = allowance.lt(minAllowance)
 		}
@@ -151,13 +147,11 @@ export default class RenewModal extends Vue {
 
 	async handleExpirationChange(exp: Entity.Expiration) {
 		this.selectedExpiration = exp
-		const signer = provider.getSigner()
-		let from = await signer.getAddress()
-		from = '0x8f4e36b495d4456aaf975e06e35af232ab4747b6bc464f0ca5f7896d'
-		const receipts = await payment.receipts(from)
-		const combo = await payment.combos(receipts.level)
+		const from = '0xe739d6ce0e554d92bbdcc294f7b7e68abf436930c1d5402cbdcc8f9b'
+		const receipts = await this.payment().receipts(from)
+		const combo = await this.payment().combos(receipts.level)
 		if (combo.isValid) {
-			this.cost = await payment.getComboCost(
+			this.cost = await this.payment().getComboCost(
 				receipts.level,
 				this.selectedExpiration.value
 			)

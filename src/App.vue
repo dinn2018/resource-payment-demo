@@ -10,7 +10,7 @@
 					Connect
 				</a-button>
 				<div v-else>
-					Connected: {{ formatAccount }} Network: {{ network }}
+					Connected: {{ formatAccount }} Network: {{ networkName }}
 					<a-icon
 						v-if="isNetworkSupported"
 						style="color: green"
@@ -45,7 +45,6 @@
 import { Vue, Component } from 'vue-property-decorator'
 import { UPDATE_ACCOUNT, UPDATE_CHAINID, UPDATE_EXPIRATIONS } from '@/store'
 import { formatNetwork, isNetworkSupported } from '@/utils'
-import { provider } from '@/factories'
 
 @Component
 export default class App extends Vue {
@@ -65,18 +64,17 @@ export default class App extends Vue {
 		return !!this.$store.state.account
 	}
 
-	get network() {
+	get networkName() {
 		return formatNetwork(this.$store.state.chainId)
 	}
 
 	async checkState() {
 		if (window.ethereum) {
 			this.initExpirations()
-			const signer = provider.getSigner()
-			const account = await signer.getAddress()
-			const chainId = await signer.getChainId()
-			this.$store.commit(UPDATE_ACCOUNT, account)
-			this.$store.commit(UPDATE_CHAINID, chainId)
+			const net = await this.network()
+			console.log(net)
+			this.$store.commit(UPDATE_ACCOUNT, await this.account())
+			this.$store.commit(UPDATE_CHAINID, net.chainId)
 		}
 	}
 
